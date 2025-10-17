@@ -1,7 +1,7 @@
 "use client"
 
-import { Textarea } from "@/components/ui/textarea"
-import type { TextContent } from "@/lib/blocks/types"
+import { InlineEditor } from "@/components/editor/inline-editor"
+import type { InlineFormat, TextContent } from "@/lib/blocks/types"
 import { useBlockStore } from "@/lib/stores/block-store"
 import { useCallback } from "react"
 
@@ -21,20 +21,20 @@ export function TextBlock({
 	const updateBlock = useBlockStore((state) => state.updateBlock)
 
 	const handleChange = useCallback(
-		(text: string) => {
-			updateBlock(pageId, blockId, { text })
+		(text: string, formats?: InlineFormat[]) => {
+			updateBlock(pageId, blockId, { text, formats })
 		},
 		[blockId, pageId, updateBlock],
 	)
 
 	if (isEditing) {
 		return (
-			<Textarea
+			<InlineEditor
 				value={content.text}
-				onChange={(e) => handleChange(e.target.value)}
-				className="min-h-[24px] resize-none bg-transparent text-base placeholder:text-muted-foreground"
+				formats={content.formats}
+				onChange={handleChange}
 				placeholder="Start typing..."
-				rows={1}
+				multiline
 			/>
 		)
 	}

@@ -9,13 +9,24 @@ export type BlockType =
 	| "divider"
 	| "image"
 
+export type InlineStyle = "bold" | "italic" | "code" | "link"
+
+export interface InlineFormat {
+	style: InlineStyle
+	start: number
+	end: number
+	data?: Record<string, string>
+}
+
 export interface TextContent {
 	text: string
+	formats?: InlineFormat[]
 }
 
 export interface HeadingContent {
 	text: string
 	level: 1 | 2 | 3
+	formats?: InlineFormat[]
 }
 
 export interface ListContent {
@@ -56,8 +67,8 @@ export interface Block {
 }
 
 export const defaultBlockContent: Record<BlockType, unknown> = {
-	text: { text: "" },
-	heading: { text: "", level: 1 },
+	text: { text: "", formats: [] },
+	heading: { text: "", level: 1, formats: [] },
 	bulleted_list: { text: "" },
 	numbered_list: { text: "" },
 	todo: { text: "", checked: false },
