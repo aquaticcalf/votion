@@ -1,19 +1,16 @@
 import { blockRouter } from "@/server/api/routers/block"
 import { pageRouter } from "@/server/api/routers/page"
 import { postRouter } from "@/server/api/routers/post"
+import { userRouter } from "@/server/api/routers/user"
 import { workspaceRouter } from "@/server/api/routers/workspace"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
 
-/**
- * This is the primary router for your server.
- *
- * All routers added in /api/routers should be manually added here.
- */
 export const appRouter = createTRPCRouter({
 	post: postRouter,
 	page: pageRouter,
 	block: blockRouter,
 	workspace: workspaceRouter,
+	user: userRouter,
 })
 
 // export type definition of API

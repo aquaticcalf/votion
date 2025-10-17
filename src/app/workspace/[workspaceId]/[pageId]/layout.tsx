@@ -13,14 +13,18 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-export default function Layout({
+export default async function Layout({
 	children,
+	params,
 }: {
 	children: React.ReactNode
+	params: Promise<{ workspaceId: string }>
 }) {
+	const { workspaceId } = await params
+
 	return (
 		<SidebarProvider>
-			<AppSidebar />
+			<AppSidebar workspaceId={workspaceId} />
 			<SidebarInset>
 				<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 					<SidebarTrigger className="-ml-1" />
