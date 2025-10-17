@@ -1,3 +1,4 @@
+import type { Block } from "@/lib/blocks/types"
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
 import { z } from "zod"
 
@@ -23,6 +24,26 @@ const getPageBlocksSchema = z.object({
 	pageId: z.string(),
 })
 
+function mapPrismaBlockToBlock(block: {
+	id: string
+	type: string
+	content: unknown
+	order: number
+	pageId: string
+	createdAt: Date
+	updatedAt: Date
+}): Block {
+	return {
+		id: block.id,
+		type: block.type as Block["type"],
+		content: block.content as Block["content"],
+		order: block.order,
+		pageId: block.pageId,
+		createdAt: block.createdAt,
+		updatedAt: block.updatedAt,
+	}
+}
+
 export const blockRouter = createTRPCRouter({
 	create: protectedProcedure
 		.input(createBlockSchema)
@@ -44,7 +65,7 @@ export const blockRouter = createTRPCRouter({
 				},
 			})
 
-			return block
+			return mapPrismaBlockToBlock(block)
 		}),
 
 	getByPage: protectedProcedure
@@ -63,7 +84,7 @@ export const blockRouter = createTRPCRouter({
 				orderBy: { order: "asc" },
 			})
 
-			return blocks
+			return blocks.map(mapPrismaBlockToBlock)
 		}),
 
 	update: protectedProcedure
@@ -84,7 +105,7 @@ export const blockRouter = createTRPCRouter({
 				},
 			})
 
-			return block
+			return mapPrismaBlockToBlock(block)
 		}),
 
 	delete: protectedProcedure
