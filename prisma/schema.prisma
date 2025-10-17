@@ -14,6 +14,77 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Workspace {
+    id        String   @id @default(cuid())
+    name      String   @default("My Workspace")
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    pages     Page[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model Page {
+    id          String    @id @default(cuid())
+    title       String    @default("Untitled")
+    icon        String?
+    cover       String?
+    parentId    String?
+    parent      Page?     @relation("PageChildren", fields: [parentId], references: [id], onDelete: Cascade)
+    children    Page[]    @relation("PageChildren")
+    workspaceId String
+    workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+    userId      String
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    blocks      Block[]
+    database    Database?
+    archived    Boolean   @default(false)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    @@index([workspaceId])
+    @@index([userId])
+    @@index([parentId])
+}
+
+model Block {
+    id        String   @id @default(cuid())
+    type      String
+    content   Json
+    order     Int
+    pageId    String
+    page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([pageId])
+}
+
+model Database {
+    id         String         @id @default(cuid())
+    pageId     String         @unique
+    page       Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+    properties Json
+    rows       DatabaseRow[]
+    createdAt  DateTime       @default(now())
+    updatedAt  DateTime       @updatedAt
+
+    @@index([pageId])
+}
+
+model DatabaseRow {
+    id         String   @id @default(cuid())
+    databaseId String
+    database   Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+    values     Json
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@index([databaseId])
+}
+
 model Post {
     id        Int      @id @default(autoincrement())
     name      String
@@ -55,16 +126,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String      @id @default(cuid())
     name          String?
-    email         String?   @unique
-    username      String?   @unique
+    email         String?     @unique
+    username      String?     @unique
     password      String?
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    workspaces    Workspace[]
+    pages         Page[]
 }
 
 model VerificationToken {
