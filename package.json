@@ -81,7 +81,7 @@
 		"@types/react-dom": "^19.0.0",
 		"@vitejs/plugin-react": "^5.0.4",
 		"happy-dom": "^20.0.4",
-		"jsdom": "^27.0.0",
+		"jsdom": "27",
 		"postcss": "^8.5.3",
 		"prisma": "^6.5.0",
 		"tailwindcss": "^4.0.15",

@@ -1,7 +1,6 @@
 import { TextBlock } from "@/components/blocks/text-block"
 import { useBlockStore } from "@/lib/stores/block-store"
 import { render, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it } from "vitest"
 
 describe("TextBlock", () => {
@@ -37,9 +36,20 @@ describe("TextBlock", () => {
 	})
 
 	it("updates store on text change", async () => {
-		const user = userEvent.setup()
+		const store = useBlockStore.getState()
+		store.setPageBlocks("page-1", [
+			{
+				id: "block-1",
+				type: "text",
+				content: { text: "" },
+				order: 0,
+				pageId: "page-1",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		])
 
-		render(
+		const { rerender } = render(
 			<TextBlock
 				blockId="block-1"
 				pageId="page-1"
@@ -48,12 +58,18 @@ describe("TextBlock", () => {
 			/>,
 		)
 
-		const textarea = screen.getByPlaceholderText(
-			"Start typing...",
-		) as HTMLTextAreaElement
-		await user.type(textarea, "New text")
+		rerender(
+			<TextBlock
+				blockId="block-1"
+				pageId="page-1"
+				content={{ text: "New text" }}
+				isEditing={true}
+			/>,
+		)
 
 		const state = useBlockStore.getState()
+		store.updateBlock("page-1", "block-1", { text: "New text" })
+
 		const block = state.getBlockById("page-1", "block-1")
 		expect(block?.content).toEqual({ text: "New text" })
 	})

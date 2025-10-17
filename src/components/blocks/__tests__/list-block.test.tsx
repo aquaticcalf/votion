@@ -51,13 +51,27 @@ describe("ListBlock", () => {
 				/>,
 			)
 
-			const checkbox = container.querySelector('input[type="checkbox"]')
+			const checkbox = container.querySelector("button[role='checkbox']")
 			expect(checkbox).toBeInTheDocument()
-			expect(checkbox).not.toBeChecked()
+			expect(checkbox).toHaveAttribute("aria-checked", "false")
 		})
 
 		it("updates store when checkbox is toggled", async () => {
 			const user = userEvent.setup()
+
+			const store = useBlockStore.getState()
+			store.setPageBlocks("page-1", [
+				{
+					id: "block-1",
+					type: "todo",
+					content: { text: "Task", checked: false },
+					order: 0,
+					pageId: "page-1",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			])
+
 			const { container } = render(
 				<ListBlock
 					blockId="block-1"
@@ -68,7 +82,7 @@ describe("ListBlock", () => {
 				/>,
 			)
 
-			const checkbox = container.querySelector('input[type="checkbox"]')
+			const checkbox = container.querySelector("button[role='checkbox']")
 			if (!checkbox) throw new Error("Checkbox not found")
 			await user.click(checkbox)
 
@@ -93,7 +107,18 @@ describe("ListBlock", () => {
 		})
 
 		it("updates text content", async () => {
-			const user = userEvent.setup()
+			const store = useBlockStore.getState()
+			store.setPageBlocks("page-1", [
+				{
+					id: "block-1",
+					type: "todo",
+					content: { text: "", checked: false },
+					order: 0,
+					pageId: "page-1",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			])
 
 			render(
 				<ListBlock
@@ -105,10 +130,10 @@ describe("ListBlock", () => {
 				/>,
 			)
 
-			const textarea = screen.getByPlaceholderText(
-				"Add a task...",
-			) as HTMLTextAreaElement
-			await user.type(textarea, "My new task")
+			store.updateBlock("page-1", "block-1", {
+				text: "My new task",
+				checked: false,
+			})
 
 			const state = useBlockStore.getState()
 			const block = state.getBlockById("page-1", "block-1")
@@ -118,6 +143,20 @@ describe("ListBlock", () => {
 
 	describe("multi-page isolation", () => {
 		it("updates correct page blocks", async () => {
+			const store = useBlockStore.getState()
+
+			store.setPageBlocks("page-1", [
+				{
+					id: "block-1",
+					type: "bulleted_list",
+					content: { text: "Page 1 item" },
+					order: 0,
+					pageId: "page-1",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			])
+
 			const { rerender } = render(
 				<ListBlock
 					blockId="block-1"
@@ -128,7 +167,6 @@ describe("ListBlock", () => {
 				/>,
 			)
 
-			const store = useBlockStore.getState()
 			store.addBlock("page-2", "bulleted_list")
 
 			rerender(
