@@ -1,3 +1,5 @@
+// @vitest-environment happy-dom
+
 import { ListBlock } from "@/components/blocks/list-block"
 import { useBlockStore } from "@/lib/stores/block-store"
 import { render, screen } from "@testing-library/react"

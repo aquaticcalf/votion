@@ -2,6 +2,12 @@ import "@testing-library/jest-dom"
 import { cleanup } from "@testing-library/react"
 import { afterEach, expect } from "vitest"
 
+if (typeof window !== "undefined" && typeof document === "undefined") {
+	throw new Error(
+		"Document is undefined - testing environment may not be configured correctly",
+	)
+}
+
 afterEach(() => {
 	cleanup()
 })
